@@ -1,0 +1,171 @@
+import java.io.BufferedWriter;
+import java.io.File; // Importa a classe FILE
+import java.io.PrintWriter;
+import java.io.FileWriter; // Importa a Classe de FileWriter
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.regex.Pattern;
+public class Cadastro {
+	
+
+	public static void main(String[] args) throws Exception {
+		System.out.println("BEM VINDO(A) AO SISTEMA DE CADASTRO.\nESCOLHA UMA OPCAO");
+		// CRIAR O TXT DE USUARIO
+		File file = new File("User.txt");
+		PrintWriter output = new PrintWriter(new FileWriter(file, true));
+		Scanner input = new Scanner(file);
+		Scanner in = new Scanner(System.in);
+		Scanner keyboard = new Scanner(System.in);
+		String underscore = "_";
+		 System.out.println("1. Registrar");
+		 System.out.println("2. Login");
+		 int opcao = keyboard.nextInt();
+		 switch (opcao) {
+		 case 1:
+			// NOME COMPLETO, PRIMEIRA LETRA, ULTIMO SOBRENOME
+				
+				System.out.print("Digite seu nome completo:");
+				String name = in.nextLine();
+				char first = name.charAt(0);
+				String LastWord = name.substring(name.lastIndexOf(" ")+1);
+				String username = first + underscore + LastWord;
+			    System.out.print("Digite sua senha: ");
+			    String passwordhere = in.nextLine();
+			    System.out.print("Confirme sua senha: ");
+			    String confirmhere = in.nextLine();
+			    
+			    List<String> errorList = new ArrayList<String>();
+
+			    while (!isValid(passwordhere, confirmhere, errorList)) {
+			        System.out.println("A senha e invalida");
+			        for (String error : errorList) {
+			            System.out.println(error);
+			        }
+
+			        System.out.print("Digite sua senha: ");
+			        passwordhere = in.nextLine();
+			        System.out.print("Confirme sua senha: ");
+			        confirmhere = in.nextLine();
+			    }
+			 // ESCREVER A SENHA E USUARIO NO TXT CRIADO
+			    
+			    try(FileWriter fw = new FileWriter("usuarios.txt", true);
+							BufferedWriter bw = new BufferedWriter(fw);
+							PrintWriter out = new PrintWriter(bw))
+					{
+					
+			    	output.println("\n");
+			    	output.println(username);
+			    	output.println(passwordhere);
+						System.out.println("Usuario criado com sucesso..");
+						System.out.print("Nome do seu usuario: " + username);
+					output.close();
+			//ESCOLHER SE VAI FAZER LOGIN APÓS O REGISTRO OU NAO
+				System.out.println("\nDeseja fazer o login agora?\nSe sim, digite 1\nSe nao, digite 2");
+				System.out.print("Resposta: ");
+				int option = keyboard.nextInt();
+				switch (option) {
+				//SIM
+				case 1:
+					System.out.println("PAGINA DE LOGIN");
+					System.out.print("Nome de usuario: ");
+					String User = keyboard.next();
+					boolean found = false;
+					while(input.hasNext() && !found) {
+						if (input.next().equals(User)) {	
+							System.out.print("Senha: ");
+							String Pass = keyboard.next();
+							if (input.next().equals(Pass)) {
+								System.out.println("Logado com sucesso");
+								found = true;
+								break;
+							}
+						}
+					}
+				 
+				 if(!found) {
+					 System.out.println("Senha ou usuario incorreto");
+				 }
+				 break;
+					default:
+					         System.out.println("Escolha 1 ou 2, Por favor!");
+					         
+					//NAO
+				case 2:
+					System.out.println("Ok, acesse quando quiser.");
+					break;
+			}
+				
+					}
+		break;
+		 
+			     case 2:
+			
+			// FAZER LOGIN.....
+			System.out.println("PAGINA DE LOGIN");
+			System.out.print("Nome de usuario: ");
+			String User = keyboard.next();
+			boolean found = false;
+			while(input.hasNext() && !found) {
+				if (input.next().equals(User)) {	
+					System.out.print("Senha: ");
+					String Pass = keyboard.next();
+					if (input.next().equals(Pass)) {
+						System.out.println("Logado com sucesso");
+							
+						found = true;
+						break;
+					}
+				}
+			}
+		 //SE O USUARIO ESTIVER INCORRETO (OU SENHA).
+		 if(!found) {
+			 System.out.println("Senha ou usuario incorreto");
+		 }
+		 // SE O DIGITO FOR MAIOR QUE 2
+		 break;
+		 
+			default:
+			         System.out.println("Escolha 1 ou 2, Por favor");
+	}
+}
+	
+		
+
+// SEGURANÇA DA SENHA
+	public static boolean isValid(String passwordhere, String confirmhere, List<String> errorList) {
+
+	    Pattern specailCharPatten = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
+	    Pattern UpperCasePatten = Pattern.compile("[A-Z ]");
+	    Pattern lowerCasePatten = Pattern.compile("[a-z ]");
+	    errorList.clear();
+
+	    boolean flag=true;
+
+	    if (!passwordhere.equals(confirmhere)) {
+	        errorList.add("Essas senhas nao se coincidem.\nTente Novamente");
+	        flag=false;
+	    }
+	    if (passwordhere.length() < 8) {
+	        errorList.add("A senha precisa ter no minimo 8 caracteres !!");
+	        flag=false;
+	    }
+	    if (!specailCharPatten.matcher(passwordhere).find()) {
+	        errorList.add("A senha precisa ter pelo menos um caractere especial !!");
+	        flag=false;
+	    }
+	    if (!UpperCasePatten.matcher(passwordhere).find()) {
+	        errorList.add("A senha precisa ter pelo menos uma letra maiuscula !!");
+	        flag=false;
+	    }
+	    if (!lowerCasePatten.matcher(passwordhere).find()) {
+	        errorList.add("A senha precisa ter pelo menos uma letra minuscula !!");
+	        flag=false;
+	    }
+
+		return flag;
+	}
+
+
+}
